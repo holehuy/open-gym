@@ -1,0 +1,1 @@
+import{Ta as e}from"./measurements-B6sQrYC_.js";var t=[`coach`,`integrations`,`community`],n=[`hevy`,`strava`,`webdav`,`calendar`,`webhook`,`coach`,`mcp`,`opennutrition`],r=!1,i=new Set,a=()=>r;function o(n){n=!!n,n!==r&&(r=n,e(n?t:[]),i.forEach(e=>{try{e()}catch{}}))}function s(e){return i.add(e),()=>i.delete(e)}export{s as a,o as i,t as n,a as r,n as t};
