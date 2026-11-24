@@ -10,5 +10,10 @@
 // time, so the demo-only UI folds away and the seed generator — imported dynamically — never
 // lands in a self-hosted bundle.
 export const DEMO = import.meta.env.VITE_DEMO === '1'
+// Static build (VITE_STATIC=1): the same no-backend setup as the demo, for real use on a static
+// host such as GitHub Pages, but starting empty instead of on example data. NO_SERVER is true for
+// both: guest mode only, and nothing that needs the API (passkeys, sync) is offered.
+export const STATIC = import.meta.env.VITE_STATIC === '1'
+export const NO_SERVER = DEMO || STATIC
 export const DEMO_SEEDED = 'gym_demo_seeded_v1'
 export const REPO = 'https://gitlab.com/DuarteSantos8/opengym'

@@ -3,7 +3,8 @@
 # at https://holehuy.github.io/open-gym/. The same branch is what .github/workflows/pages.yml
 # pushes to, so a local deploy and a CI deploy are interchangeable.
 #
-# Guest-mode build (no VITE_DEMO, so it starts empty) plus the 180 px exercise media.
+# Static build (VITE_STATIC=1: guest mode only, no passkey or profile sign-in, no example data)
+# plus the 180 px exercise media.
 #
 # Usage: scripts/deploy-pages.sh [remote]     remote defaults to "holehuy"
 set -euo pipefail
@@ -20,7 +21,7 @@ fi
 
 cd "$ROOT/frontend"
 npm ci --no-audit --no-fund
-npm run build
+VITE_STATIC=1 npm run build
 node "$ROOT/scripts/catalogue/stage-media.mjs" "$DIST"
 touch "$DIST/.nojekyll"
 

@@ -391,11 +391,11 @@ describe('iPhone: the rest tone never stops the music', () => {
     expect(core).not.toMatch(/import (UIKit|AVFoundation)/)
   })
 
-  it('the app project compiles the ledger in and CI tests it', () => {
+  // This fork has no iOS CI workflow (.github/workflows/ios.yml was removed), so only the
+  // project file is checked.
+  it('the app project compiles the ledger in', () => {
     const pbx = readFileSync(new URL('../../ios/App/App.xcodeproj/project.pbxproj', import.meta.url), 'utf8')
     expect(pbx).toMatch(/CueAudioLedger\.swift in Sources/)
-    const ci = readFileSync(new URL('../../../.github/workflows/ios.yml', import.meta.url), 'utf8')
-    expect(ci).toMatch(/working-directory: frontend\/ios\/App\/CueAudioCore/)
   })
 })
 

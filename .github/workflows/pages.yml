@@ -3,8 +3,9 @@
 # scripts/deploy-pages.sh does the same thing from a local machine, so either way works.
 #
 # Pages serves static files only, so there is no backend: the app runs in guest mode and keeps
-# its data in the browser. Unlike the upstream demo this build does NOT set VITE_DEMO, so it
-# starts empty. Vite's base is './', so the build works under the /open-gym/ sub-path.
+# its data in the browser. VITE_STATIC=1 boots straight into guest mode and hides passkey and
+# profile sign-in, which would only fail here (405). Unlike the upstream demo it does NOT set
+# VITE_DEMO, so it starts empty. Vite's base is './', so the build works under /open-gym/.
 # The 180 px exercise stills and animations from catalogue/media are staged next to the build
 # by scripts/catalogue/stage-media.mjs.
 name: Deploy to GitHub Pages
@@ -42,6 +43,8 @@ jobs:
         working-directory: frontend
       - run: npm run build
         working-directory: frontend
+        env:
+          VITE_STATIC: '1'
       - run: node scripts/catalogue/stage-media.mjs frontend/dist && touch frontend/dist/.nojekyll
 
       - name: Push to gh-pages

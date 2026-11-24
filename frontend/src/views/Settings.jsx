@@ -51,7 +51,7 @@ import { wakeLockSupported } from '../lib/wakelock.js'
 import { t, tn, LANGS, INSTR_LANGS, EXERCISE_NAME_LANGS, baseLang, dateLocale } from '../lib/i18n.js'
 import { nameIn, said } from '../lib/a11y-name.js'
 import { effectiveLang } from '../lib/default-lang.js'
-import { DEMO, REPO } from '../lib/demo.js'
+import { DEMO, NO_SERVER, REPO } from '../lib/demo.js'
 import { MOBILE, isAndroid, shareExport, shareExportBlob, syncReminder } from '../lib/mobile.js'
 import { NUDGE_COPY, NUDGE_TONES, toneOf } from '../lib/nudge.js'
 import { referencedFiles } from '../lib/media-refs.js'
@@ -144,7 +144,7 @@ export function SettingsRoute() {
   const modules = useStore(s => s.S.modules), checkIn = useStore(s => s.S.checkIn)
   const trainers = useStore(s => !!s.config?.trainers?.on)
   const apiTokens = useStore(s => !!s.config?.api_tokens)
-  const ctx = { user: useStore(s => s.user), mobile: MOBILE, offline: offlineBuild(), demo: DEMO, trainers, apiTokens, ios: MOBILE && platformNow() !== 'android', android: MOBILE && platformNow() !== 'ios', mod: id => isOn({ modules, checkIn }, id) }
+  const ctx = { user: useStore(s => s.user), mobile: MOBILE, offline: offlineBuild(), demo: DEMO, noServer: NO_SERVER, trainers, apiTokens, ios: MOBILE && platformNow() !== 'android', android: MOBILE && platformNow() !== 'ios', mod: id => isOn({ modules, checkIn }, id) }
   if (page && (!PAGES[page] || !pageVisible(PAGES[page].parent || page, ctx) || !pageVisible(page, ctx))) return <Navigate to="/settings" replace />
   if (page === 'coach') return <Navigate to="/coach/setup" replace />
   return <Settings key={page || 'root'} page={page || null} find={loc.state?.find || null} via={loc.state?.via || null} entryKey={loc.key} />
@@ -1181,7 +1181,7 @@ export default function Settings({ page = null, find = null, via = null, entryKe
         {/* The bar at the top that says the app is offline, kept local, or not synced (#369, #330).
             Here and not under Server & sync, which a phone kept local never shows. Switching it on
             also brings back the no-server line its × hid (#454). */}
-        {!DEMO && <Row icon="cloud" iconTint="var(--blue)" title={t('Show connection status')}
+        {!NO_SERVER && <Row icon="cloud" iconTint="var(--blue)" title={t('Show connection status')}
           subtitle={t('Off: the bar at the top is hidden. A dot on Home still warns when syncing is stuck.')}>
           <Switch checked={S.connStatus !== false} onChange={v => update(s => { s.connStatus = v; if (v) s.connLocal = true })} />
         </Row>}
@@ -1390,6 +1390,9 @@ export default function Settings({ page = null, find = null, via = null, entryKe
             onClick={() => confirmSheet({ title: t('Reset demo data?'), message: t('Puts the example plan, workouts and weigh-ins back the way they started.'), confirmText: t('Reset'), onConfirm: () => { resetDemo(); nav('/home'); toast(t('Demo data reset')) } })} />
           <Row icon="rocket" iconTint="var(--indigo)" title={t('Self-host openGym')} subtitle={t('Passkey sign-in, sync across your devices, your own data.')} accessory="chevron"
             onClick={() => window.open(REPO, '_blank', 'noopener')} />
+        </> : NO_SERVER ? <>
+          {/* Static build: nothing to sign in to, so no passkey or profile rows that would only fail. */}
+          <Row icon="lock" iconTint="var(--acc)" title={t('Guest mode: your data lives only in this browser.')} subtitle={t('No account, no cloud. Back it up anytime in Data & backup.')} />
         </> : user ? <>
           {community && <Row icon="globe" iconTint="var(--blue)" title={t('Community')} subtitle={t('What people on this server shared')} accessory="chevron" onClick={() => nav('/community')} />}
           {user.admin && <Row icon="crown" iconTint="var(--indigo)" title={t('Admin dashboard')} accessory="chevron" onClick={() => nav('/admin')} />}
@@ -1429,7 +1432,7 @@ export default function Settings({ page = null, find = null, via = null, entryKe
       </Section>}
       {/* The connection banner already says this to a guest; the line is for when it is switched
           off, or its × hid it (#454). */}
-      {!user && !DEMO && !MOBILE && !(showsConnection(S) && showsLocalLine(S)) && <p className="sect-f" style={{ marginTop: -18, marginBottom: 22 }}>{t('Guest mode: your data lives only in this browser.')}</p>}
+      {!user && !NO_SERVER && !MOBILE && !(showsConnection(S) && showsLocalLine(S)) && <p className="sect-f" style={{ marginTop: -18, marginBottom: 22 }}>{t('Guest mode: your data lives only in this browser.')}</p>}
     </>,
   }
 
@@ -1472,6 +1475,7 @@ function SettingsRoot({ ctx, preview, open, user, sync, home, go, entryKey }) {
       sub: sync && sync.status && sync.status !== 'ok' ? t('Sync needs a look') : MOBILE ? t('Synced with your server') : t('Account, devices and sync'),
     }
     : MOBILE ? { title: t('This phone'), sub: t('All data stays on this phone') }
+    : NO_SERVER ? { title: t('Guest'), sub: t('Guest mode: your data lives only in this browser.') }
     : { title: t('Guest'), sub: t('Your data lives on this device. Sign in to sync.') }
   // The face: one's own picture (components/Avatar.jsx), else the name's first letter, else the icon.
   const faceName = user && !DEMO ? (String(user.name || '').trim() || '?') : null

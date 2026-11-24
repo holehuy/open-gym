@@ -291,7 +291,7 @@ export const SEARCH = [
   { page: 'themes', title: 'Festive colors', icon: 'palette', tint: 'var(--purple)', kw: 'christmas red green accent color colour seasonal', when: () => available('christmas') },
   { page: 'look', title: 'Motion', icon: 'sparkles', tint: 'var(--teal)', kw: 'reduce motion animation animations accessibility calm still vestibular', opts: ['Like the phone', 'Less'] },
   { page: 'look', title: 'Text size', icon: 'note', tint: 'var(--blue)', kw: 'text size font fonts letters type typeface bigger larger smaller tiny huge big small scale dynamic accessibility zoom read reading eyes glasses', opts: ['Smallest', 'Small', 'Default', 'Large', 'Larger', 'Largest'], tkw: () => t('font text size bigger smaller letters') },
-  { page: 'look', title: 'Show connection status', icon: 'cloud', tint: 'var(--blue)', kw: 'sync offline banner bar connection', when: c => !c.demo },
+  { page: 'look', title: 'Show connection status', icon: 'cloud', tint: 'var(--blue)', kw: 'sync offline banner bar connection', when: c => !c.noServer },
   // Data & backup
   { page: 'data', title: 'Export backup (JSON)', icon: 'share', tint: 'var(--blue)', kw: 'export backup json download save' },
   { page: 'data', title: 'Export with photos & videos (.zip)', icon: 'share', tint: 'var(--blue)', kw: 'zip media export backup', when: c => c.hasMedia },
@@ -375,9 +375,9 @@ export const SEARCH = [
   { page: 'account', title: 'Admin dashboard', icon: 'crown', tint: 'var(--indigo)', kw: 'admin users dashboard', when: c => !!c.user?.admin && !c.demo },
   { page: 'account', title: 'Disconnect', net: true, icon: 'signOut', tint: 'var(--red)', kw: 'disconnect server local', when: c => c.mobile && !!c.user },
   { page: 'account', title: 'Connect to my server', net: true, icon: 'cloud', tint: 'var(--indigo)', kw: 'server sync self-hosted connect', when: c => c.mobile && !c.user },
-  { page: 'account', title: 'Sign in with passkey', icon: 'fingerprint', tint: 'var(--blue)', kw: 'login sign in log in passkey', when: c => !c.mobile && !c.demo && !c.user && c.webauthn },
-  { page: 'account', title: 'Sign in with password', icon: 'key', tint: 'var(--orange)', kw: 'login sign in log in password', when: c => !c.mobile && !c.demo && !c.user && c.pwOn },
-  { page: 'account', title: 'Create passkey profile', icon: 'plusCircle', tint: 'var(--acc)', kw: 'register account sign up create profile', when: c => !c.mobile && !c.demo && !c.user && c.webauthn },
+  { page: 'account', title: 'Sign in with passkey', icon: 'fingerprint', tint: 'var(--blue)', kw: 'login sign in log in passkey', when: c => !c.mobile && !c.noServer && !c.user && c.webauthn },
+  { page: 'account', title: 'Sign in with password', icon: 'key', tint: 'var(--orange)', kw: 'login sign in log in password', when: c => !c.mobile && !c.noServer && !c.user && c.pwOn },
+  { page: 'account', title: 'Create passkey profile', icon: 'plusCircle', tint: 'var(--acc)', kw: 'register account sign up create profile', when: c => !c.mobile && !c.noServer && !c.user && c.webauthn },
   { page: 'account', title: 'Reset demo data', icon: 'reset', tint: 'var(--blue)', kw: 'demo reset example', when: c => c.demo },
 ]
 

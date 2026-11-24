@@ -35,7 +35,7 @@ vi.mock('../lib/api.js', () => ({
 }))
 vi.mock('../lib/mobile.js', () => ({ get MOBILE() { return mocks.MOBILE }, nativePlatform: async () => null, isAndroid: async () => false }))
 vi.mock('../components/Passkeys.jsx', () => ({ openDeviceLinkRedeem: vi.fn(() => { mocks.redeem = true }) }))
-vi.mock('../lib/demo.js', () => ({ DEMO: false, REPO: 'https://example.invalid' }))
+vi.mock('../lib/demo.js', () => ({ DEMO: false, NO_SERVER: false, REPO: 'https://example.invalid' }))
 vi.mock('../sheets.jsx', () => ({ askAddDeviceData: vi.fn(), confirmSheet: vi.fn() }))
 
 const { default: Login } = await import('./Login.jsx')

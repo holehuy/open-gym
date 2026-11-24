@@ -3,7 +3,7 @@ import { useUI } from '../store/useUI.js'
 import { webauthnOK, passkeyLogin, passkeyRegister, passkeyError, bio } from '../lib/api.js'
 import { hasData } from '../store/useStore.js'
 import { t } from '../lib/i18n.js'
-import { DEMO, REPO } from '../lib/demo.js'
+import { DEMO, NO_SERVER, REPO } from '../lib/demo.js'
 import { guestAllowed } from '../lib/guest.js'
 import { useState, useRef, useEffect } from 'react'
 import BrandLogo from '../components/BrandLogo.jsx'
@@ -102,6 +102,16 @@ export default function Login() {
     <h1 style={{ margin: '0 0 10px', display: 'flex', justifyContent: 'center' }}><BrandLogo size={36} /></h1>
   </>
   const wrap = { display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '78vh', textAlign: 'center' }
+
+  // Static build: no backend to sign in against either, and no example data. The boot puts it
+  // straight into guest mode, so this screen only shows if that was ever undone.
+  if (NO_SERVER && !DEMO) return (
+    <div className="narrow" style={wrap}>
+      {head}
+      <div className="muted" style={{ marginBottom: 30 }}>{t('Guest mode: your data lives only in this browser.')}</div>
+      <Button variant="primary" icon="play" onClick={() => setGuest(true)}>{t('Continue without account')}</Button>
+    </div>
+  )
 
   // Demo build: no backend to sign in against — the only way in is the local guest profile.
   if (DEMO) return (
