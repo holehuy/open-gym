@@ -18,10 +18,10 @@ describe('effectiveLang', () => {
     expect(effectiveLang(null, null, ['it'])).toBe('en')
     expect(effectiveLang({ lang: '' }, null, [])).toBe('en')
   })
-  it('gives an unpicked copy the instance default, then the browser\'s language', () => {
+  it('gives an unpicked copy the instance default, then Vietnamese', () => {
     expect(effectiveLang(auto, { default_lang: 'fr' }, ['it'])).toBe('fr')
-    expect(effectiveLang(auto, { default_lang: '' }, ['it-IT'])).toBe('it')
-    expect(effectiveLang(auto, { default_lang: '' }, ['nl'])).toBe('en')
+    expect(effectiveLang(auto, { default_lang: '' }, ['it-IT'])).toBe('vi')
+    expect(effectiveLang(auto, { default_lang: '' }, ['nl'])).toBe('vi')
   })
   it('before the config is in, uses the default this device saw last', () => {
     rememberDefaultLang({ default_lang: 'fr' })
@@ -30,10 +30,10 @@ describe('effectiveLang', () => {
   it('reads a remembered "no default" as no default, not as unknown', () => {
     rememberDefaultLang({})
     expect(localStorage.getItem('gym_default_lang')).toBe('')
-    expect(effectiveLang(auto, null, ['it'])).toBe('it')
+    expect(effectiveLang(auto, null, ['it'])).toBe('vi')
   })
-  it('with nothing seen yet, shows the stored language unchanged until the config answers', () => {
-    expect(effectiveLang({ lang: 'pt', langAuto: true }, null, ['it'])).toBe('pt')
+  it('with no config ever (a static build), an unpicked copy is in Vietnamese', () => {
+    expect(effectiveLang({ lang: 'pt', langAuto: true }, null, ['it'])).toBe('vi')
   })
 })
 

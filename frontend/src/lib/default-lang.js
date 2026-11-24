@@ -7,7 +7,7 @@
 // they are — including every existing profile whose `lang` is the old default.
 //
 // For a marked copy, the instance's DEFAULT_LANG (GET /api/config `default_lang`) comes first,
-// then the first of the browser's languages this app speaks, then English.
+// then Vietnamese, this fork's default (FALLBACK_LANG). The browser's language is not consulted.
 //
 // That answer is worked out where the language is used (effectiveLang) and never written back
 // into the state. It depends on the device — two phones of one profile can have browsers in two
@@ -17,6 +17,9 @@
 import { LANGS } from './i18n-core.js'
 
 const KEYS = Object.keys(LANGS)
+
+/** The language a copy that never picked one is shown in when the instance sets none. */
+export const FALLBACK_LANG = 'vi'
 
 /** A language tag ('pt-BR', 'pt_br', 'de-AT', 'en-US') as one of LANGS' keys, or null. */
 export function matchLocale(tag) {
@@ -35,9 +38,7 @@ export function matchLocale(tag) {
 /** The language a copy that never chose one should be in, or null for a copy that chose. */
 export function autoLang(S, config, navLangs = []) {
   if (!S || S.langAuto !== true) return null
-  return matchLocale(config?.default_lang)
-    || (navLangs || []).map(matchLocale).find(Boolean)
-    || 'en'
+  return matchLocale(config?.default_lang) || FALLBACK_LANG
 }
 
 // The instance's DEFAULT_LANG as last seen on this device, so a boot does not show the browser's
@@ -61,9 +62,9 @@ export function effectiveLang(S, config, navLangs = browserLangs()) {
   if (!S || S.langAuto !== true) return own
   let cfg = config
   if (!cfg) {
+    // No config yet (or ever, on a static build): the default this device last saw, else none.
     const seen = cachedDefaultLang()
-    if (seen === null) return own
-    cfg = { default_lang: seen }
+    cfg = seen === null ? {} : { default_lang: seen }
   }
   return autoLang(S, cfg, navLangs) || own
 }

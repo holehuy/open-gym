@@ -26,7 +26,6 @@ describe('Persian language selection', () => {
     expect(LANGS.fa).toBe('فارسی')
     expect(RTL_LANGS.has('fa')).toBe(true)
     for (const tag of ['fa', 'fa-IR', 'fa_IR', 'FA-ir', 'fa-AF']) expect(matchLocale(tag)).toBe('fa')
-    expect(autoLang({ langAuto: true }, {}, ['fa-IR', 'en-US'])).toBe('fa')
     expect(autoLang({ langAuto: true }, { default_lang: 'fa-IR' }, ['en-US'])).toBe('fa')
   })
 
