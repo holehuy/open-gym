@@ -1,9 +1,10 @@
-# Builds the web app and publishes it to GitHub Pages: https://holehuy.github.io/open-gym/
+# Builds the web app and publishes it to the gh-pages branch, which GitHub Pages serves at
+# https://holehuy.github.io/open-gym/ (Settings → Pages → Deploy from a branch: gh-pages, /).
+# scripts/deploy-pages.sh does the same thing from a local machine, so either way works.
 #
 # Pages serves static files only, so there is no backend: the app runs in guest mode and keeps
 # its data in the browser. Unlike the upstream demo this build does NOT set VITE_DEMO, so it
-# starts empty instead of with seeded example history. Vite's base is './', so the same build
-# works under the /open-gym/ sub-path.
+# starts empty. Vite's base is './', so the build works under the /open-gym/ sub-path.
 # The 180 px exercise stills and animations from catalogue/media are staged next to the build
 # by scripts/catalogue/stage-media.mjs.
 name: Deploy to GitHub Pages
@@ -19,16 +20,15 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write   # push to gh-pages
+  pages: write      # request the Pages build
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -42,18 +42,22 @@ jobs:
         working-directory: frontend
       - run: npm run build
         working-directory: frontend
-      - run: node scripts/catalogue/stage-media.mjs frontend/dist
-      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
-      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
-        with:
-          path: frontend/dist
+      - run: node scripts/catalogue/stage-media.mjs frontend/dist && touch frontend/dist/.nojekyll
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    steps:
-      - id: deploy
-        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+      - name: Push to gh-pages
+        working-directory: frontend/dist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git init -q -b gh-pages
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -q -m "Deploy ${GITHUB_SHA::9} to GitHub Pages (workflow)"
+          git push -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
+
+      # A push made with the workflow token may not start a Pages build on its own; ask for one.
+      - name: Request Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" || true
